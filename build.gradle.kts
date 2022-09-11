@@ -1,6 +1,9 @@
+import com.avast.gradle.dockercompose.tasks.ComposeUp
+
 plugins {
     java
     id("org.springframework.boot") version "2.7.3"
+    id("com.avast.gradle.docker-compose") version "0.16.9"
 }
 
 apply(plugin = "io.spring.dependency-management")
@@ -16,6 +19,10 @@ tasks["jar"].enabled = false
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+}
+
+tasks.named<ComposeUp>("composeUp") {
+    dependsOn("build")
 }
 
 val mapstructVersion = "1.5.2.Final"
