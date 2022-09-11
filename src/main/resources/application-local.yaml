@@ -1,0 +1,3 @@
+spring:
+  r2dbc:
+    url: ${local.postgresql.url}

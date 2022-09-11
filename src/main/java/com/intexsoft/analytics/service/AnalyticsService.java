@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-import com.intexsoft.analytics.dto.department.DepartmentDto;
-import com.intexsoft.analytics.dto.employee.EmployeeDto;
 import com.intexsoft.analytics.dto.analytics.SalaryAnalyticsDto;
 import com.intexsoft.analytics.dto.analytics.SeniorityAnalyticsDto;
+import com.intexsoft.analytics.dto.department.DepartmentDto;
+import com.intexsoft.analytics.dto.employee.EmployeeDto;
 import com.intexsoft.analytics.model.SelectionCriteria;
 import com.intexsoft.analytics.model.Title;
 import lombok.RequiredArgsConstructor;
