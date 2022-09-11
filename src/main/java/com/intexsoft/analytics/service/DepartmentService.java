@@ -3,7 +3,7 @@ package com.intexsoft.analytics.service;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import com.intexsoft.analytics.dto.DepartmentDto;
+import com.intexsoft.analytics.dto.department.DepartmentDto;
 import com.intexsoft.analytics.exception.DepartmentException;
 import com.intexsoft.analytics.mapper.DepartmentMapper;
 import com.intexsoft.analytics.repository.DepartmentRepository;

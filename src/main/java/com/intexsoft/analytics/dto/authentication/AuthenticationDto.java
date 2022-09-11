@@ -1,4 +1,6 @@
-package com.intexsoft.analytics.dto;
+package com.intexsoft.analytics.dto.authentication;
+
+import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,10 +11,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SeniorityAnalyticsDto {
+public class AuthenticationDto {
 
-    private String departmentName;
+    private String email;
 
-    private Double seniorityIndex;
+    private UUID departmentId;
 
 }

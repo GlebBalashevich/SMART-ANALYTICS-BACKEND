@@ -1,10 +1,9 @@
-package com.intexsoft.analytics.dto;
+package com.intexsoft.analytics.dto.employee;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import com.intexsoft.analytics.model.JobRole;
 import com.intexsoft.analytics.model.Title;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +33,5 @@ public class EmployeeDto {
     private BigDecimal salary;
 
     private Title title;
-
-    private JobRole jobRole;
 
 }

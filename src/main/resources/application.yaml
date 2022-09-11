@@ -25,3 +25,6 @@ spring:
   security:
     enabled: true
 
+token:
+  jwt-secret: 3cd31293-9b20-487e-bd88-858f4e330067
+

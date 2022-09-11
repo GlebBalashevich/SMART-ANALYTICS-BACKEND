@@ -38,8 +38,6 @@ public class Employee {
 
     private Title title;
 
-    private JobRole jobRole;
-
     private Boolean isDeleted;
 
     @CreatedDate

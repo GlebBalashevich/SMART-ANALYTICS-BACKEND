@@ -2,13 +2,14 @@ package com.intexsoft.analytics.controller;
 
 import java.util.UUID;
 
-import com.intexsoft.analytics.dto.EmployeeDto;
-import com.intexsoft.analytics.dto.UpsertEmployeeRequestDto;
+import com.intexsoft.analytics.dto.employee.EmployeeDto;
+import com.intexsoft.analytics.dto.employee.UpsertEmployeeRequestDto;
 import com.intexsoft.analytics.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,26 +33,31 @@ public class EmployeeController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("@serviceAccess.canAccessToDepartmentData(authentication, #requestDto.departmentId)")
     public Mono<EmployeeDto> addEmployee(@RequestBody @Validated UpsertEmployeeRequestDto requestDto) {
         return employeeService.addEmployee(requestDto);
     }
 
     @GetMapping("{id}")
+    @PreAuthorize("@serviceAccess.canAccess(authentication)")
     public Mono<EmployeeDto> retrieveEmployeeById(@PathVariable UUID id) {
         return employeeService.retrieveEmployeeById(id);
     }
 
     @GetMapping
+    @PreAuthorize("@serviceAccess.canAccess(authentication)")
     public Flux<EmployeeDto> retrieveAllEmployees() {
         return employeeService.retrieveAllEmployees();
     }
 
     @GetMapping("/departments/{departmentId}")
+    @PreAuthorize("@serviceAccess.canAccessToDepartmentData(authentication, #departmentId)")
     public Flux<EmployeeDto> retrieveEmployeesByDepartmentId(@PathVariable UUID departmentId) {
         return employeeService.retrieveEmployeesByDepartmentId(departmentId);
     }
 
     @PutMapping("{id}")
+    @PreAuthorize("@serviceAccess.canAccessToDepartmentData(authentication, #requestDto.departmentId)")
     public Mono<EmployeeDto> updateEmployee(@PathVariable UUID id,
             @RequestBody @Validated UpsertEmployeeRequestDto requestDto) {
         return employeeService.updateEmployee(id, requestDto);
@@ -59,6 +65,7 @@ public class EmployeeController {
 
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@serviceAccess.canAccess(authentication)")
     public Mono<Void> deleteEmployee(@PathVariable UUID id) {
         return employeeService.deleteEmployee(id);
     }

@@ -1,19 +1,13 @@
-package com.intexsoft.analytics.dto;
+package com.intexsoft.analytics.dto.authentication;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 import com.intexsoft.analytics.validation.Password;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class RegistrationRequestDto {
+public class AuthenticationRequestDto {
 
     @NotBlank
     @Email
@@ -22,4 +16,5 @@ public class RegistrationRequestDto {
     @NotBlank
     @Password
     private String password;
+
 }

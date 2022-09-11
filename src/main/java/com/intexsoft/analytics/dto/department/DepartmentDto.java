@@ -1,4 +1,4 @@
-package com.intexsoft.analytics.dto;
+package com.intexsoft.analytics.dto.department;
 
 import java.math.BigDecimal;
 import java.util.UUID;

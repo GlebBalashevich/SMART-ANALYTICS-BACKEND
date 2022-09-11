@@ -1,4 +1,4 @@
-package com.intexsoft.analytics.dto;
+package com.intexsoft.analytics.dto.analytics;
 
 import java.math.BigDecimal;
 

@@ -1,6 +1,5 @@
 package com.intexsoft.analytics.repository;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 import com.intexsoft.analytics.model.Employee;
@@ -15,7 +14,7 @@ public interface EmployeeRepository extends ReactiveCrudRepository<Employee, UUI
 
     Mono<Boolean> existsEmployeeByEmail(String email);
 
-    Mono<Employee> findEmployeeByEmail(String email);
+    Mono<Employee> findEmployeeByEmailAndIsDeletedFalse(String email);
 
     Flux<Employee> findAllByIsDeletedFalse();
 

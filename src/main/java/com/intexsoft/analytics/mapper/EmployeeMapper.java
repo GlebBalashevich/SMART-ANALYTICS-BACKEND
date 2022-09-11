@@ -1,7 +1,7 @@
 package com.intexsoft.analytics.mapper;
 
-import com.intexsoft.analytics.dto.EmployeeDto;
-import com.intexsoft.analytics.dto.UpsertEmployeeRequestDto;
+import com.intexsoft.analytics.dto.employee.EmployeeDto;
+import com.intexsoft.analytics.dto.employee.UpsertEmployeeRequestDto;
 import com.intexsoft.analytics.model.Employee;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

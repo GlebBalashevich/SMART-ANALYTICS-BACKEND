@@ -2,9 +2,9 @@ package com.intexsoft.analytics.service;
 
 import java.util.UUID;
 
-import com.intexsoft.analytics.dto.DepartmentDto;
-import com.intexsoft.analytics.dto.EmployeeDto;
-import com.intexsoft.analytics.dto.UpsertEmployeeRequestDto;
+import com.intexsoft.analytics.dto.department.DepartmentDto;
+import com.intexsoft.analytics.dto.employee.EmployeeDto;
+import com.intexsoft.analytics.dto.employee.UpsertEmployeeRequestDto;
 import com.intexsoft.analytics.exception.EmployeeException;
 import com.intexsoft.analytics.mapper.EmployeeMapper;
 import com.intexsoft.analytics.model.Employee;
@@ -27,7 +27,9 @@ public class EmployeeService {
 
     private static final String EMPLOYEE_EXISTS_BY_EMAIL_ERROR_MESSAGE = "Employee with email:%s already exists";
 
-    private static final String EMPLOYEE_NOT_FOUND_ERROR_MESSAGE = "Employee with id:%s not found";
+    private static final String EMPLOYEE_NOT_FOUND_BY_ID_ERROR_MESSAGE = "Employee with id:%s not found";
+
+    private static final String EMPLOYEE_NOT_FOUND_BY_EMAIL_ERROR_MESSAGE = "Employee with email:%s not found";
 
     private final EmployeeRepository employeeRepository;
 
@@ -50,8 +52,8 @@ public class EmployeeService {
 
     public Mono<EmployeeDto> retrieveEmployeeById(UUID id) {
         return employeeRepository.findById(id)
-                .switchIfEmpty(Mono.defer(() -> error(String.format(EMPLOYEE_NOT_FOUND_ERROR_MESSAGE, id),
-                        HttpStatus.NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND)))
+                .switchIfEmpty(Mono.defer(() -> error(String.format(EMPLOYEE_NOT_FOUND_BY_ID_ERROR_MESSAGE, id),
+                        HttpStatus.NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND_BY_ID)))
                 .map(employeeMapper::toEmployeeDto);
     }
 
@@ -78,9 +80,9 @@ public class EmployeeService {
     public Mono<EmployeeDto> updateEmployee(UUID id, UpsertEmployeeRequestDto requestDto) {
         return departmentService.findDepartmentById(requestDto.getDepartmentId())
                 .flatMap(department -> employeeRepository.findById(id))
-                .switchIfEmpty(Mono.defer(() -> error(String.format(EMPLOYEE_NOT_FOUND_ERROR_MESSAGE, id),
-                        HttpStatus.NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND)))
-                .zipWith(employeeRepository.findEmployeeByEmail(requestDto.getEmail()))
+                .switchIfEmpty(Mono.defer(() -> error(String.format(EMPLOYEE_NOT_FOUND_BY_ID_ERROR_MESSAGE, id),
+                        HttpStatus.NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND_BY_ID)))
+                .zipWith(employeeRepository.findEmployeeByEmailAndIsDeletedFalse(requestDto.getEmail()))
                 .filter(tuple -> tuple.getT1().getId().equals(tuple.getT2().getId()))
                 .switchIfEmpty(Mono.defer(() -> error(String.format(EMPLOYEE_EXISTS_BY_EMAIL_ERROR_MESSAGE,
                         requestDto.getEmail()), HttpStatus.BAD_REQUEST, ErrorCode.EMPLOYEE_EXISTS_BY_EMAIL)))
@@ -93,8 +95,8 @@ public class EmployeeService {
 
     public Mono<Void> deleteEmployee(UUID id) {
         return employeeRepository.findById(id)
-                .switchIfEmpty(Mono.defer(() -> error(String.format(EMPLOYEE_NOT_FOUND_ERROR_MESSAGE, id),
-                        HttpStatus.NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND)))
+                .switchIfEmpty(Mono.defer(() -> error(String.format(EMPLOYEE_NOT_FOUND_BY_ID_ERROR_MESSAGE, id),
+                        HttpStatus.NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND_BY_ID)))
                 .zipWhen(employee -> departmentService.decreaseSalaryBudget(employee.getDepartmentId(),
                         employee.getSalary()))
                 .doOnNext(tuple -> tuple.getT1().setIsDeleted(Boolean.TRUE))
@@ -112,7 +114,6 @@ public class EmployeeService {
                 .hireDate(requestDto.getHireDate())
                 .salary(requestDto.getSalary())
                 .title(requestDto.getTitle())
-                .jobRole(requestDto.getJobRole())
                 .isDeleted(Boolean.FALSE)
                 .build();
     }

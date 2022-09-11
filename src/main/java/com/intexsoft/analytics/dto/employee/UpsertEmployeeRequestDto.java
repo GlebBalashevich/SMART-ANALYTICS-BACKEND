@@ -1,4 +1,4 @@
-package com.intexsoft.analytics.dto;
+package com.intexsoft.analytics.dto.employee;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,7 +12,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 
-import com.intexsoft.analytics.model.JobRole;
 import com.intexsoft.analytics.model.Title;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -54,8 +53,5 @@ public class UpsertEmployeeRequestDto {
 
     @NotNull
     private Title title;
-
-    @NotNull
-    private JobRole jobRole;
 
 }

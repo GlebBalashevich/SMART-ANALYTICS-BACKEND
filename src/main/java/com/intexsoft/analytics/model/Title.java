@@ -13,7 +13,7 @@ public enum Title {
 
     SENIOR(3),
 
-    MANAGER(4);
+    LEAD(4);
 
     private final int seniorityIndex;
 }

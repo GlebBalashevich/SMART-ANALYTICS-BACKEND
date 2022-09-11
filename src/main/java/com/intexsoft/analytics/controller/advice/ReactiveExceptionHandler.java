@@ -9,6 +9,8 @@ import com.intexsoft.analytics.util.ErrorUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.server.ServerWebExchange;
@@ -16,13 +18,13 @@ import org.springframework.web.server.ServerWebInputException;
 
 @Slf4j
 @RestControllerAdvice
-public class ExceptionHandler {
+public class ReactiveExceptionHandler {
 
     private static final String INTERNAL_SERVER_ERROR_MESSAGE = "Internal server error occurred, contact server administrator";
 
     private static final String BAD_REQUEST_MESSAGE = "Invalid request parameters";
 
-    @org.springframework.web.bind.annotation.ExceptionHandler(BaseException.class)
+    @ExceptionHandler(BaseException.class)
     public ResponseEntity<BaseErrorResponse> handle(BaseException e, ServerWebExchange serverWebExchange) {
         final var httpStatus = e.getHttpStatus();
         final var errorCode = e.getErrorCode();
@@ -31,7 +33,7 @@ public class ExceptionHandler {
                 httpStatus);
     }
 
-    @org.springframework.web.bind.annotation.ExceptionHandler(WebExchangeBindException.class)
+    @ExceptionHandler(WebExchangeBindException.class)
     public ResponseEntity<BadRequestErrorResponse> handle(WebExchangeBindException e,
             ServerWebExchange serverWebExchange) {
         final var httpStatus = HttpStatus.BAD_REQUEST;
@@ -41,7 +43,15 @@ public class ExceptionHandler {
                 httpStatus);
     }
 
-    @org.springframework.web.bind.annotation.ExceptionHandler(ServerWebInputException.class)
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<BaseErrorResponse> handle(AccessDeniedException e, ServerWebExchange serverWebExchange) {
+        final var httpStatus = HttpStatus.FORBIDDEN;
+        final var errorCode = ErrorUtils.defineCode(httpStatus);
+        return new ResponseEntity<>(buildBaseErrorResponse(serverWebExchange, errorCode, e.getMessage(), httpStatus),
+                httpStatus);
+    }
+
+    @ExceptionHandler(ServerWebInputException.class)
     public ResponseEntity<BaseErrorResponse> handle(ServerWebInputException e, ServerWebExchange serverWebExchange) {
         final var httpStatus = HttpStatus.BAD_REQUEST;
         final var errorCode = ErrorUtils.defineCode(httpStatus);
@@ -50,7 +60,7 @@ public class ExceptionHandler {
                 httpStatus);
     }
 
-    @org.springframework.web.bind.annotation.ExceptionHandler(Throwable.class)
+    @ExceptionHandler(Throwable.class)
     public ResponseEntity<BaseErrorResponse> handle(Throwable e, ServerWebExchange serverWebExchange) {
         log.error("Error occurred while processing request", e);
         final var httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;

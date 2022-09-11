@@ -1,6 +1,8 @@
 package com.intexsoft.analytics.controller;
 
-import com.intexsoft.analytics.dto.RegistrationRequestDto;
+import com.intexsoft.analytics.dto.authentication.AuthenticationDto;
+import com.intexsoft.analytics.dto.authentication.AuthenticationRequestDto;
+import com.intexsoft.analytics.dto.authentication.AuthenticationResponseDto;
 import com.intexsoft.analytics.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +23,13 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public Mono<String> register(@RequestBody @Validated RegistrationRequestDto requestDto){
+    public Mono<AuthenticationDto> register(@RequestBody @Validated AuthenticationRequestDto requestDto) {
         return authenticationService.register(requestDto);
+    }
+
+    @PostMapping("/login")
+    public Mono<AuthenticationResponseDto> login(@RequestBody @Validated AuthenticationRequestDto requestDto) {
+        return authenticationService.login(requestDto);
     }
 
 }
