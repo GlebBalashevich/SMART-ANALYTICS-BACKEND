@@ -6,7 +6,7 @@ import com.intexsoft.analytics.dto.department.DepartmentDto;
 import com.intexsoft.analytics.dto.employee.EmployeeDto;
 import com.intexsoft.analytics.dto.employee.UpsertEmployeeRequestDto;
 import com.intexsoft.analytics.exception.EmployeeException;
-import com.intexsoft.analytics.mapper.EmployeeMapper;
+import com.intexsoft.analytics.mapper.AnalyticsMapper;
 import com.intexsoft.analytics.model.Employee;
 import com.intexsoft.analytics.model.SelectionCriteria;
 import com.intexsoft.analytics.model.Title;
@@ -29,11 +29,9 @@ public class EmployeeService {
 
     private static final String EMPLOYEE_NOT_FOUND_BY_ID_ERROR_MESSAGE = "Employee with id:%s not found";
 
-    private static final String EMPLOYEE_NOT_FOUND_BY_EMAIL_ERROR_MESSAGE = "Employee with email:%s not found";
-
     private final EmployeeRepository employeeRepository;
 
-    private final EmployeeMapper employeeMapper;
+    private final AnalyticsMapper analyticsMapper;
 
     private final DepartmentService departmentService;
 
@@ -45,21 +43,21 @@ public class EmployeeService {
                 .flatMap(exists -> departmentService.findDepartmentById(requestDto.getDepartmentId()))
                 .flatMap(department -> departmentService.increaseSalaryBudget(department.getId(),
                         requestDto.getSalary()))
-                .map(department -> employeeMapper.toEmployee(requestDto))
+                .map(department -> analyticsMapper.toEmployee(requestDto))
                 .flatMap(employeeRepository::save)
-                .map(employeeMapper::toEmployeeDto);
+                .map(analyticsMapper::toEmployeeDto);
     }
 
     public Mono<EmployeeDto> retrieveEmployeeById(UUID id) {
         return employeeRepository.findById(id)
                 .switchIfEmpty(Mono.defer(() -> error(String.format(EMPLOYEE_NOT_FOUND_BY_ID_ERROR_MESSAGE, id),
                         HttpStatus.NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND_BY_ID)))
-                .map(employeeMapper::toEmployeeDto);
+                .map(analyticsMapper::toEmployeeDto);
     }
 
     public Flux<EmployeeDto> retrieveEmployeesByDepartmentId(UUID departmentId) {
         return employeeRepository.findEmployeesByDepartmentIdAndIsDeletedFalse(departmentId)
-                .map(employeeMapper::toEmployeeDto);
+                .map(analyticsMapper::toEmployeeDto);
     }
 
     public Mono<EmployeeDto> findEmployeeWithBorderSalary(UUID departmentId, Title title,
@@ -69,7 +67,7 @@ public class EmployeeService {
                 : employeeRepository.findFirstByDepartmentIdAndTitleOrderBySalaryAsc(departmentId, title);
         return employee
                 .defaultIfEmpty(Employee.builder().build())
-                .map(employeeMapper::toEmployeeDto);
+                .map(analyticsMapper::toEmployeeDto);
     }
 
     public Mono<EmployeeDto> updateEmployee(UUID id, UpsertEmployeeRequestDto requestDto) {
@@ -85,7 +83,7 @@ public class EmployeeService {
                 .zipWhen(employee -> updateDepartmentSalaryBudget(employee, requestDto))
                 .map(tuple -> mergeEmployee(tuple.getT1(), requestDto))
                 .flatMap(employeeRepository::save)
-                .map(employeeMapper::toEmployeeDto);
+                .map(analyticsMapper::toEmployeeDto);
     }
 
     public Mono<Void> deleteEmployee(UUID id) {

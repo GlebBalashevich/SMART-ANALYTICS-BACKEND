@@ -4,7 +4,7 @@ import com.intexsoft.analytics.dto.authentication.AuthenticationDto;
 import com.intexsoft.analytics.dto.authentication.AuthenticationRequestDto;
 import com.intexsoft.analytics.dto.authentication.AuthenticationResponseDto;
 import com.intexsoft.analytics.exception.AuthenticationException;
-import com.intexsoft.analytics.mapper.AuthenticationMapper;
+import com.intexsoft.analytics.mapper.AnalyticsMapper;
 import com.intexsoft.analytics.repository.AuthenticationRepository;
 import com.intexsoft.analytics.security.JwtTokenProvider;
 import com.intexsoft.analytics.util.ErrorCode;
@@ -27,7 +27,7 @@ public class AuthenticationService {
 
     private final AuthenticationRepository authenticationRepository;
 
-    private final AuthenticationMapper authenticationMapper;
+    private final AnalyticsMapper analyticsMapper;
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -42,7 +42,7 @@ public class AuthenticationService {
                         ErrorCode.USER_REGISTERED)))
                 .doOnNext(auth -> auth.setPassword(passwordEncoder.encode(requestDto.getPassword())))
                 .flatMap(authenticationRepository::save)
-                .map(authenticationMapper::toAuthenticationDto);
+                .map(analyticsMapper::toAuthenticationDto);
     }
 
     public Mono<AuthenticationResponseDto> login(AuthenticationRequestDto requestDto) {

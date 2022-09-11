@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import com.intexsoft.analytics.dto.department.DepartmentDto;
 import com.intexsoft.analytics.exception.DepartmentException;
-import com.intexsoft.analytics.mapper.DepartmentMapper;
+import com.intexsoft.analytics.mapper.AnalyticsMapper;
 import com.intexsoft.analytics.repository.DepartmentRepository;
 import com.intexsoft.analytics.util.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -25,18 +25,18 @@ public class DepartmentService {
 
     private final DepartmentRepository departmentRepository;
 
-    private final DepartmentMapper departmentMapper;
+    private final AnalyticsMapper analyticsMapper;
 
     public Mono<DepartmentDto> findDepartmentById(UUID id) {
         return departmentRepository.findById(id)
                 .switchIfEmpty(Mono.defer(() -> error(String.format(DEPARTMENT_NOT_FOUND_ERROR_MESSAGE, id),
                         HttpStatus.NOT_FOUND, ErrorCode.DEPARTMENT_NOT_FOUND)))
-                .map(departmentMapper::toDepartmentDto);
+                .map(analyticsMapper::toDepartmentDto);
     }
 
     public Flux<DepartmentDto> findAllDepartments() {
         return departmentRepository.findAll()
-                .map(departmentMapper::toDepartmentDto);
+                .map(analyticsMapper::toDepartmentDto);
     }
 
     public Mono<DepartmentDto> increaseSalaryBudget(UUID id, BigDecimal salaryToAdd) {
@@ -47,7 +47,7 @@ public class DepartmentService {
                 .doOnNext(tuple -> tuple.getT1().setSalaryBudget(tuple.getT2()))
                 .map(Tuple2::getT1)
                 .flatMap(departmentRepository::save)
-                .map(departmentMapper::toDepartmentDto);
+                .map(analyticsMapper::toDepartmentDto);
     }
 
     public Mono<DepartmentDto> updateSalaryBudget(UUID id, BigDecimal salaryToAdd, BigDecimal salaryToReduce) {
@@ -59,7 +59,7 @@ public class DepartmentService {
                 .doOnNext(tuple -> tuple.getT1().setSalaryBudget(tuple.getT2()))
                 .map(Tuple2::getT1)
                 .flatMap(departmentRepository::save)
-                .map(departmentMapper::toDepartmentDto);
+                .map(analyticsMapper::toDepartmentDto);
     }
 
     public Mono<DepartmentDto> decreaseSalaryBudget(UUID id, BigDecimal salaryToReduce) {
@@ -70,7 +70,7 @@ public class DepartmentService {
                 .doOnNext(tuple -> tuple.getT1().setSalaryBudget(tuple.getT2()))
                 .map(Tuple2::getT1)
                 .flatMap(departmentRepository::save)
-                .map(departmentMapper::toDepartmentDto);
+                .map(analyticsMapper::toDepartmentDto);
     }
 
     private <T> Mono<T> error(String message, HttpStatus status, String errorCode) {
