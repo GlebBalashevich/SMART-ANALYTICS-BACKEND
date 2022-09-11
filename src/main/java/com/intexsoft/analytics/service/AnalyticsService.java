@@ -28,7 +28,7 @@ public class AnalyticsService {
             SelectionCriteria selectionCriteria) {
         return departmentService.findDepartmentById(departmentId)
                 .zipWith(employeeService.findEmployeeWithBorderSalary(departmentId, title, selectionCriteria))
-                .map(tuple -> buildSalaryAnalyticsDto(tuple.getT1(), tuple.getT2(), title, selectionCriteria));
+                .map(tuple -> buildSalaryAnalyticsDto(tuple.getT1(), tuple.getT2()));
     }
 
     public Mono<SeniorityAnalyticsDto> defineDepartmentSeniority(UUID departmentId) {
@@ -38,13 +38,10 @@ public class AnalyticsService {
                 .map(tuple -> buildSeniorityAnalyticsDto(tuple.getT1(), tuple.getT2()));
     }
 
-    private SalaryAnalyticsDto buildSalaryAnalyticsDto(DepartmentDto departmentDto, EmployeeDto employeeDto,
-            Title title, SelectionCriteria selectionCriteria) {
+    private SalaryAnalyticsDto buildSalaryAnalyticsDto(DepartmentDto departmentDto, EmployeeDto employeeDto) {
         final var salaryValue = employeeDto.getSalary() == null ? BigDecimal.ZERO : employeeDto.getSalary();
         return SalaryAnalyticsDto.builder()
                 .departmentName(departmentDto.getName())
-                .title(title)
-                .selectionCriteria(selectionCriteria)
                 .salaryValue(salaryValue)
                 .build();
     }

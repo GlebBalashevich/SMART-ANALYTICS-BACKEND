@@ -13,7 +13,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface AnalyticsMapper {
 
-    AuthenticationDto toAuthenticationDto(Authentication user);
+    AuthenticationDto toAuthenticationDto(Authentication authentication);
 
     DepartmentDto toDepartmentDto(Department department);
 

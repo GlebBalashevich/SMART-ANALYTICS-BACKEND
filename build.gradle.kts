@@ -18,7 +18,7 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
 }
 
-val mapstructVersion = "1.4.2.Final"
+val mapstructVersion = "1.5.2.Final"
 
 dependencies{
 
@@ -33,7 +33,7 @@ dependencies{
     //Security Dependencies
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("io.jsonwebtoken:jjwt:0.9.1")
-    implementation("javax.xml.bind:jaxb-api:2.3.0")
+    implementation("javax.xml.bind:jaxb-api:2.3.1")
 
     //Database Dependencies
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
@@ -42,5 +42,9 @@ dependencies{
 
     //Swagger Dependencies
     implementation("org.springdoc:springdoc-openapi-webflux-ui:1.6.11")
+
+    //Test Dependencies
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("io.projectreactor:reactor-test")
 }
 
