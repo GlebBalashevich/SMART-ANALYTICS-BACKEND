@@ -33,6 +33,7 @@ public class SecurityConfiguration {
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/api/v1/auth/**").permitAll()
+                        .pathMatchers("/v3/api-docs/**", "/swagger*/**", "/configuration/**", "/webjars/**").permitAll()
                         .pathMatchers("/api/**").authenticated())
                 .addFilterAt(new JwtSecurityFilter(jwtTokenProvider), SecurityWebFiltersOrder.HTTP_BASIC)
                 .build();
@@ -44,6 +45,7 @@ public class SecurityConfiguration {
         return http
                 .cors().disable()
                 .csrf().disable()
+                .httpBasic().disable()
                 .authorizeExchange()
                 .pathMatchers("/api/**").permitAll()
                 .and()

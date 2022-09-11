@@ -57,11 +57,6 @@ public class EmployeeService {
                 .map(employeeMapper::toEmployeeDto);
     }
 
-    public Flux<EmployeeDto> retrieveAllEmployees() {
-        return employeeRepository.findAllByIsDeletedFalse()
-                .map(employeeMapper::toEmployeeDto);
-    }
-
     public Flux<EmployeeDto> retrieveEmployeesByDepartmentId(UUID departmentId) {
         return employeeRepository.findEmployeesByDepartmentIdAndIsDeletedFalse(departmentId)
                 .map(employeeMapper::toEmployeeDto);

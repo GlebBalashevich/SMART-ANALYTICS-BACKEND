@@ -5,6 +5,9 @@ import java.util.UUID;
 import com.intexsoft.analytics.dto.employee.EmployeeDto;
 import com.intexsoft.analytics.dto.employee.UpsertEmployeeRequestDto;
 import com.intexsoft.analytics.service.EmployeeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,36 +30,36 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/api/v1/employees", produces = MediaType.APPLICATION_JSON_VALUE)
+@Tag(name = "Employee API", description = "Api for operations with Employees")
+@SecurityRequirement(name = "Bearer Authentication")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(description = "Add new Employee to the system. Authz - same department manager")
     @PreAuthorize("@serviceAccess.canAccessToDepartmentData(authentication, #requestDto.departmentId)")
     public Mono<EmployeeDto> addEmployee(@RequestBody @Validated UpsertEmployeeRequestDto requestDto) {
         return employeeService.addEmployee(requestDto);
     }
 
     @GetMapping("{id}")
+    @Operation(description = "Retrieve Employee by Id")
     @PreAuthorize("@serviceAccess.canAccess(authentication)")
     public Mono<EmployeeDto> retrieveEmployeeById(@PathVariable UUID id) {
         return employeeService.retrieveEmployeeById(id);
     }
 
-    @GetMapping
-    @PreAuthorize("@serviceAccess.canAccess(authentication)")
-    public Flux<EmployeeDto> retrieveAllEmployees() {
-        return employeeService.retrieveAllEmployees();
-    }
-
     @GetMapping("/departments/{departmentId}")
+    @Operation(description = "Retrieve Employees related to the specific department. Authz - same department manager")
     @PreAuthorize("@serviceAccess.canAccessToDepartmentData(authentication, #departmentId)")
     public Flux<EmployeeDto> retrieveEmployeesByDepartmentId(@PathVariable UUID departmentId) {
         return employeeService.retrieveEmployeesByDepartmentId(departmentId);
     }
 
     @PutMapping("{id}")
+    @Operation(description = "Update Employee info. Authz - same department manager")
     @PreAuthorize("@serviceAccess.canAccessToDepartmentData(authentication, #requestDto.departmentId)")
     public Mono<EmployeeDto> updateEmployee(@PathVariable UUID id,
             @RequestBody @Validated UpsertEmployeeRequestDto requestDto) {
@@ -65,6 +68,7 @@ public class EmployeeController {
 
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(description = "Delete Employee info. Authz - same department manager")
     @PreAuthorize("@serviceAccess.canAccess(authentication)")
     public Mono<Void> deleteEmployee(@PathVariable UUID id) {
         return employeeService.deleteEmployee(id);

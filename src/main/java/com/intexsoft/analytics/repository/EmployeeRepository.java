@@ -16,8 +16,6 @@ public interface EmployeeRepository extends ReactiveCrudRepository<Employee, UUI
 
     Mono<Employee> findEmployeeByEmailAndIsDeletedFalse(String email);
 
-    Flux<Employee> findAllByIsDeletedFalse();
-
     Mono<Employee> findFirstByDepartmentIdAndTitleOrderBySalaryAsc(UUID departmentId, Title title);
 
     Mono<Employee> findFirstByDepartmentIdAndTitleOrderBySalaryDesc(UUID departmentId, Title title);

@@ -21,17 +21,26 @@ tasks.named<Test>("test") {
 val mapstructVersion = "1.4.2.Final"
 
 dependencies{
+
+    //Common Dependencies
     implementation("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
     annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
     implementation("org.mapstruct:mapstruct:$mapstructVersion")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
-    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+
+    //Security Dependencies
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("io.jsonwebtoken:jjwt:0.9.1")
     implementation("javax.xml.bind:jaxb-api:2.3.0")
+
+    //Database Dependencies
+    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("io.r2dbc:r2dbc-postgresql:0.8.13.RELEASE")
     implementation("org.postgresql:postgresql")
+
+    //Swagger Dependencies
+    implementation("org.springdoc:springdoc-openapi-webflux-ui:1.6.11")
 }
 
