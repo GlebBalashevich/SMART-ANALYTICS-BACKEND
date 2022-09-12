@@ -27,7 +27,7 @@ public class DepartmentService {
 
     private final AnalyticsMapper analyticsMapper;
 
-    public Mono<DepartmentDto> findDepartmentById(UUID id) {
+    public Mono<DepartmentDto> retrieveDepartmentById(UUID id) {
         return departmentRepository.findById(id)
                 .switchIfEmpty(Mono.defer(() -> error(String.format(DEPARTMENT_NOT_FOUND_ERROR_MESSAGE, id),
                         HttpStatus.NOT_FOUND, ErrorCode.DEPARTMENT_NOT_FOUND)))
@@ -35,7 +35,7 @@ public class DepartmentService {
                 .map(analyticsMapper::toDepartmentDto);
     }
 
-    public Flux<DepartmentDto> findAllDepartments() {
+    public Flux<DepartmentDto> retrieveAllDepartments() {
         return departmentRepository.findAll()
                 .map(analyticsMapper::toDepartmentDto);
     }

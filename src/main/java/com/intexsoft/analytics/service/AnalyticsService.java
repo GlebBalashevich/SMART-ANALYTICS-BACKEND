@@ -26,13 +26,13 @@ public class AnalyticsService {
 
     public Mono<SalaryAnalyticsDto> findDepartmentBorderSalary(UUID departmentId, Title title,
             SelectionCriteria selectionCriteria) {
-        return departmentService.findDepartmentById(departmentId)
+        return departmentService.retrieveDepartmentById(departmentId)
                 .zipWith(employeeService.findEmployeeWithBorderSalary(departmentId, title, selectionCriteria))
                 .map(tuple -> buildSalaryAnalyticsDto(tuple.getT1(), tuple.getT2()));
     }
 
     public Mono<SeniorityAnalyticsDto> defineDepartmentSeniority(UUID departmentId) {
-        return departmentService.findDepartmentById(departmentId)
+        return departmentService.retrieveDepartmentById(departmentId)
                 .zipWith(employeeService.retrieveEmployeesByDepartmentId(departmentId).collectList()
                         .map(this::calculateSeniority))
                 .map(tuple -> buildSeniorityAnalyticsDto(tuple.getT1(), tuple.getT2()));

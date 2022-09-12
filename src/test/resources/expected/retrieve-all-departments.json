@@ -1,0 +1,12 @@
+[
+    {
+        "id": "22a1db07-80a6-4578-b2d8-1d4b7326cae0",
+        "name": "Test Department",
+        "salaryBudget": 10000
+    },
+    {
+        "id": "83110a26-fa26-4cc2-8963-d86520a918f9",
+        "name": "Test Department",
+        "salaryBudget": 10000
+    }
+]

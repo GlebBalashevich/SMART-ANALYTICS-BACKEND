@@ -1,6 +1,5 @@
 package com.intexsoft.analytics.service;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 import com.intexsoft.analytics.dto.department.DepartmentDto;
@@ -15,8 +14,6 @@ import com.intexsoft.analytics.repository.EmployeeRepository;
 import com.intexsoft.analytics.util.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,20 +36,13 @@ public class EmployeeService {
 
     private final DepartmentService departmentService;
 
-    @EventListener(ApplicationReadyEvent.class)
-    public Mono<Void> setupDepartmentSalaryBudget() {
-        return departmentService.findAllDepartments()
-                .flatMap(this::setupDepartmentSalaryBudget)
-                .then();
-    }
-
     @Transactional
     public Mono<EmployeeDto> addEmployee(UpsertEmployeeRequestDto requestDto) {
         return employeeRepository.existsEmployeeByEmail(requestDto.getEmail())
                 .filter(Boolean.FALSE::equals)
                 .switchIfEmpty(Mono.defer(() -> error(String.format(EMPLOYEE_EXISTS_BY_EMAIL_ERROR_MESSAGE,
                         requestDto.getEmail()), HttpStatus.BAD_REQUEST, ErrorCode.EMPLOYEE_EXISTS_BY_EMAIL)))
-                .flatMap(exists -> departmentService.findDepartmentById(requestDto.getDepartmentId()))
+                .flatMap(exists -> departmentService.retrieveDepartmentById(requestDto.getDepartmentId()))
                 .flatMap(department -> departmentService.increaseSalaryBudget(department.getId(),
                         requestDto.getSalary()))
                 .map(department -> analyticsMapper.toEmployee(requestDto))
@@ -89,7 +79,7 @@ public class EmployeeService {
 
     @Transactional
     public Mono<EmployeeDto> updateEmployee(UUID id, UpsertEmployeeRequestDto requestDto) {
-        return departmentService.findDepartmentById(requestDto.getDepartmentId())
+        return departmentService.retrieveDepartmentById(requestDto.getDepartmentId())
                 .flatMap(department -> employeeRepository.findById(id))
                 .switchIfEmpty(Mono.defer(() -> error(String.format(EMPLOYEE_NOT_FOUND_BY_ID_ERROR_MESSAGE, id),
                         HttpStatus.NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND_BY_ID)))
@@ -131,16 +121,6 @@ public class EmployeeService {
                 .title(requestDto.getTitle())
                 .isDeleted(Boolean.FALSE)
                 .build();
-    }
-
-    private Mono<DepartmentDto> setupDepartmentSalaryBudget(DepartmentDto departmentDto) {
-        return retrieveEmployeesByDepartmentId(departmentDto.getId())
-                .collectList()
-                .map(employeeDtos -> employeeDtos.stream()
-                        .reduce(BigDecimal.ZERO, (x, employeeDto) -> x.add(employeeDto.getSalary()), BigDecimal::add))
-                .doOnNext(salaryBudget -> log.debug("Salary budget for department:{} is {}", departmentDto.getId(),
-                        salaryBudget))
-                .flatMap(salaryBudget -> departmentService.setupSalaryBudget(departmentDto.getId(), salaryBudget));
     }
 
     private Mono<DepartmentDto> updateDepartmentSalaryBudget(Employee employee, UpsertEmployeeRequestDto requestDto) {

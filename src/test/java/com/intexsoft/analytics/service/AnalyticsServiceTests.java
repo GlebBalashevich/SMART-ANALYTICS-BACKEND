@@ -46,7 +46,7 @@ class AnalyticsServiceTests {
         var employeeDto = TestDataProvider.getEmployeeDtoStub(UUID.randomUUID(), departmentId);
         var expected = TestDataProvider.getSalaryAnalyticsDtoStub();
 
-        when(departmentService.findDepartmentById(departmentId)).thenReturn(Mono.just(departmentDto));
+        when(departmentService.retrieveDepartmentById(departmentId)).thenReturn(Mono.just(departmentDto));
         when(employeeService.findEmployeeWithBorderSalary(departmentId, title, selectionCriteria))
                 .thenReturn(Mono.just(employeeDto));
 
@@ -62,7 +62,7 @@ class AnalyticsServiceTests {
         var selectionCriteria = SelectionCriteria.MAX;
         var employeeDto = TestDataProvider.getEmployeeDtoStub(UUID.randomUUID(), departmentId);
 
-        when(departmentService.findDepartmentById(departmentId)).thenReturn(
+        when(departmentService.retrieveDepartmentById(departmentId)).thenReturn(
                 Mono.error(() -> new DepartmentException("Department not found", HttpStatus.NOT_FOUND,
                         ErrorCode.DEPARTMENT_NOT_FOUND)));
         when(employeeService.findEmployeeWithBorderSalary(departmentId, title, selectionCriteria))
@@ -81,7 +81,7 @@ class AnalyticsServiceTests {
         var expected = TestDataProvider.getSalaryAnalyticsDtoStub();
         expected.setSalaryValue(BigDecimal.ZERO);
 
-        when(departmentService.findDepartmentById(departmentId)).thenReturn(Mono.just(departmentDto));
+        when(departmentService.retrieveDepartmentById(departmentId)).thenReturn(Mono.just(departmentDto));
         when(employeeService.findEmployeeWithBorderSalary(departmentId, title, selectionCriteria))
                 .thenReturn(Mono.just(EmployeeDto.builder().build()));
 
@@ -97,7 +97,7 @@ class AnalyticsServiceTests {
         var employeeDto = TestDataProvider.getEmployeeDtoStub(UUID.randomUUID(), departmentId);
         var expected = TestDataProvider.getSeniorityAnalyticsDtoStub();
 
-        when(departmentService.findDepartmentById(departmentId)).thenReturn(Mono.just(departmentDto));
+        when(departmentService.retrieveDepartmentById(departmentId)).thenReturn(Mono.just(departmentDto));
         when(employeeService.retrieveEmployeesByDepartmentId(departmentId))
                 .thenReturn(Flux.just(employeeDto));
 
@@ -111,7 +111,7 @@ class AnalyticsServiceTests {
         var departmentId = UUID.randomUUID();
         var employeeDto = TestDataProvider.getEmployeeDtoStub(UUID.randomUUID(), departmentId);
 
-        when(departmentService.findDepartmentById(departmentId)).thenReturn(
+        when(departmentService.retrieveDepartmentById(departmentId)).thenReturn(
                 Mono.error(() -> new DepartmentException("Department not found", HttpStatus.NOT_FOUND,
                         ErrorCode.DEPARTMENT_NOT_FOUND)));
         when(employeeService.retrieveEmployeesByDepartmentId(departmentId))
@@ -128,7 +128,7 @@ class AnalyticsServiceTests {
         var expected = TestDataProvider.getSeniorityAnalyticsDtoStub();
         expected.setSeniorityIndex(0.0);
 
-        when(departmentService.findDepartmentById(departmentId)).thenReturn(Mono.just(departmentDto));
+        when(departmentService.retrieveDepartmentById(departmentId)).thenReturn(Mono.just(departmentDto));
         when(employeeService.retrieveEmployeesByDepartmentId(departmentId))
                 .thenReturn(Flux.empty());
 
