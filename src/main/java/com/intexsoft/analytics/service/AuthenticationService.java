@@ -42,6 +42,7 @@ public class AuthenticationService {
                         ErrorCode.USER_REGISTERED)))
                 .doOnNext(auth -> auth.setPassword(passwordEncoder.encode(requestDto.getPassword())))
                 .flatMap(authenticationRepository::save)
+                .doOnNext(authentication -> log.debug("User with email:{} was registered", requestDto.getEmail()))
                 .map(analyticsMapper::toAuthenticationDto);
     }
 

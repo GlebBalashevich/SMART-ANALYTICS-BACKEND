@@ -31,11 +31,22 @@ public class DepartmentService {
         return departmentRepository.findById(id)
                 .switchIfEmpty(Mono.defer(() -> error(String.format(DEPARTMENT_NOT_FOUND_ERROR_MESSAGE, id),
                         HttpStatus.NOT_FOUND, ErrorCode.DEPARTMENT_NOT_FOUND)))
+                .doOnNext(department -> log.debug("Department with id:{} was found", id))
                 .map(analyticsMapper::toDepartmentDto);
     }
 
     public Flux<DepartmentDto> findAllDepartments() {
         return departmentRepository.findAll()
+                .map(analyticsMapper::toDepartmentDto);
+    }
+
+    public Mono<DepartmentDto> setupSalaryBudget(UUID id, BigDecimal salary) {
+        return departmentRepository.findById(id)
+                .switchIfEmpty(Mono.defer(() -> error(String.format(DEPARTMENT_NOT_FOUND_ERROR_MESSAGE, id),
+                        HttpStatus.NOT_FOUND, ErrorCode.DEPARTMENT_NOT_FOUND)))
+                .doOnNext(department -> department.setSalaryBudget(salary))
+                .flatMap(departmentRepository::save)
+                .doOnNext(department -> log.debug("Salary budget:{} has been set up for Department:{}", salary, id))
                 .map(analyticsMapper::toDepartmentDto);
     }
 
@@ -47,6 +58,8 @@ public class DepartmentService {
                 .doOnNext(tuple -> tuple.getT1().setSalaryBudget(tuple.getT2()))
                 .map(Tuple2::getT1)
                 .flatMap(departmentRepository::save)
+                .doOnNext(
+                        department -> log.debug("Salary budget was increased on:{} for Department:{}", salaryToAdd, id))
                 .map(analyticsMapper::toDepartmentDto);
     }
 
@@ -59,6 +72,8 @@ public class DepartmentService {
                 .doOnNext(tuple -> tuple.getT1().setSalaryBudget(tuple.getT2()))
                 .map(Tuple2::getT1)
                 .flatMap(departmentRepository::save)
+                .doOnNext(department -> log.debug("Salary budget was updated from {} to {} for Department:{}",
+                        salaryToReduce, salaryToAdd, id))
                 .map(analyticsMapper::toDepartmentDto);
     }
 
@@ -70,6 +85,8 @@ public class DepartmentService {
                 .doOnNext(tuple -> tuple.getT1().setSalaryBudget(tuple.getT2()))
                 .map(Tuple2::getT1)
                 .flatMap(departmentRepository::save)
+                .doOnNext(department -> log.debug("Salary budget was decreased on {} for Department:{}", salaryToReduce,
+                        id))
                 .map(analyticsMapper::toDepartmentDto);
     }
 

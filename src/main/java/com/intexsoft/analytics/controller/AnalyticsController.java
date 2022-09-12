@@ -36,6 +36,7 @@ public class AnalyticsController {
     @PreAuthorize("@serviceAccess.canAccessToDepartmentData(authentication, #id)")
     public Mono<SalaryAnalyticsDto> findDepartmentBorderSalary(@PathVariable UUID id,
             @RequestParam Title title, @RequestParam SelectionCriteria selectionCriteria) {
+        log.debug("Requested Find department salary border for department:{}", id);
         return analyticsService.findDepartmentBorderSalary(id, title, selectionCriteria);
     }
 
@@ -43,6 +44,7 @@ public class AnalyticsController {
     @Operation(description = "Define Department's seniority index")
     @PreAuthorize("@serviceAccess.canAccessToDepartmentData(authentication, #id)")
     public Mono<SeniorityAnalyticsDto> defineDepartmentSeniority(@PathVariable UUID id) {
+        log.debug("Requested Define department seniority for department:{}", id);
         return analyticsService.defineDepartmentSeniority(id);
     }
 

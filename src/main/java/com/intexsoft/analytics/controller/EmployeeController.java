@@ -41,6 +41,7 @@ public class EmployeeController {
     @Operation(description = "Add new Employee to the system. Authz - same department manager")
     @PreAuthorize("@serviceAccess.canAccessToDepartmentData(authentication, #requestDto.departmentId)")
     public Mono<EmployeeDto> addEmployee(@RequestBody @Validated UpsertEmployeeRequestDto requestDto) {
+        log.debug("Requested Adding new employee with email:{}", requestDto.getEmail());
         return employeeService.addEmployee(requestDto);
     }
 
@@ -48,6 +49,7 @@ public class EmployeeController {
     @Operation(description = "Retrieve Employee by Id")
     @PreAuthorize("@serviceAccess.canAccess(authentication)")
     public Mono<EmployeeDto> retrieveEmployeeById(@PathVariable UUID id) {
+        log.debug("Requested Retrieving employee by id:{}", id);
         return employeeService.retrieveEmployeeById(id);
     }
 
@@ -55,6 +57,7 @@ public class EmployeeController {
     @Operation(description = "Retrieve Employees related to the specific department. Authz - same department manager")
     @PreAuthorize("@serviceAccess.canAccessToDepartmentData(authentication, #departmentId)")
     public Flux<EmployeeDto> retrieveEmployeesByDepartmentId(@PathVariable UUID departmentId) {
+        log.debug("Requested Retrieving employees by departmentId:{}", departmentId);
         return employeeService.retrieveEmployeesByDepartmentId(departmentId);
     }
 
@@ -63,6 +66,7 @@ public class EmployeeController {
     @PreAuthorize("@serviceAccess.canAccessToDepartmentData(authentication, #requestDto.departmentId)")
     public Mono<EmployeeDto> updateEmployee(@PathVariable UUID id,
             @RequestBody @Validated UpsertEmployeeRequestDto requestDto) {
+        log.debug("Requested Updating employee with email:{}", requestDto.getEmail());
         return employeeService.updateEmployee(id, requestDto);
     }
 
@@ -71,6 +75,7 @@ public class EmployeeController {
     @Operation(description = "Delete Employee info. Authz - same department manager")
     @PreAuthorize("@serviceAccess.canAccess(authentication)")
     public Mono<Void> deleteEmployee(@PathVariable UUID id) {
+        log.debug("Requested Deleting employee by id:{}", id);
         return employeeService.deleteEmployee(id);
     }
 

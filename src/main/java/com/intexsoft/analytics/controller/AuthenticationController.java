@@ -31,12 +31,14 @@ public class AuthenticationController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(description = "Department manager registration")
     public Mono<AuthenticationDto> register(@RequestBody @Validated AuthenticationRequestDto requestDto) {
+        log.debug("Requested registration for user:{}", requestDto.getEmail());
         return authenticationService.register(requestDto);
     }
 
     @PostMapping("/login")
     @Operation(description = "Department manager authorization")
     public Mono<AuthenticationResponseDto> login(@RequestBody @Validated AuthenticationRequestDto requestDto) {
+        log.debug("Requested login for user:{}", requestDto.getEmail());
         return authenticationService.login(requestDto);
     }
 

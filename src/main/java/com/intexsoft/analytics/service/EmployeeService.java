@@ -1,5 +1,6 @@
 package com.intexsoft.analytics.service;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import com.intexsoft.analytics.dto.department.DepartmentDto;
@@ -14,8 +15,11 @@ import com.intexsoft.analytics.repository.EmployeeRepository;
 import com.intexsoft.analytics.util.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
@@ -35,6 +39,14 @@ public class EmployeeService {
 
     private final DepartmentService departmentService;
 
+    @EventListener(ApplicationReadyEvent.class)
+    public Mono<Void> setupDepartmentSalaryBudget() {
+        return departmentService.findAllDepartments()
+                .flatMap(this::setupDepartmentSalaryBudget)
+                .then();
+    }
+
+    @Transactional
     public Mono<EmployeeDto> addEmployee(UpsertEmployeeRequestDto requestDto) {
         return employeeRepository.existsEmployeeByEmail(requestDto.getEmail())
                 .filter(Boolean.FALSE::equals)
@@ -45,6 +57,8 @@ public class EmployeeService {
                         requestDto.getSalary()))
                 .map(department -> analyticsMapper.toEmployee(requestDto))
                 .flatMap(employeeRepository::save)
+                .doOnNext(employee -> log.debug("Employee with email:{} was successfully created, id:{}",
+                        employee.getEmail(), employee.getId()))
                 .map(analyticsMapper::toEmployeeDto);
     }
 
@@ -52,6 +66,7 @@ public class EmployeeService {
         return employeeRepository.findById(id)
                 .switchIfEmpty(Mono.defer(() -> error(String.format(EMPLOYEE_NOT_FOUND_BY_ID_ERROR_MESSAGE, id),
                         HttpStatus.NOT_FOUND, ErrorCode.EMPLOYEE_NOT_FOUND_BY_ID)))
+                .doOnNext(employee -> log.debug("Employee with id:{} was successfully found", id))
                 .map(analyticsMapper::toEmployeeDto);
     }
 
@@ -66,10 +81,13 @@ public class EmployeeService {
                 ? employeeRepository.findFirstByDepartmentIdAndTitleOrderBySalaryDesc(departmentId, title)
                 : employeeRepository.findFirstByDepartmentIdAndTitleOrderBySalaryAsc(departmentId, title);
         return employee
+                .doOnNext(emp -> log.debug("Employee with title:{} for criteria:{} for department was found:{}", title,
+                        selectionCriteria, departmentId))
                 .defaultIfEmpty(Employee.builder().build())
                 .map(analyticsMapper::toEmployeeDto);
     }
 
+    @Transactional
     public Mono<EmployeeDto> updateEmployee(UUID id, UpsertEmployeeRequestDto requestDto) {
         return departmentService.findDepartmentById(requestDto.getDepartmentId())
                 .flatMap(department -> employeeRepository.findById(id))
@@ -83,9 +101,11 @@ public class EmployeeService {
                 .zipWhen(employee -> updateDepartmentSalaryBudget(employee, requestDto))
                 .map(tuple -> mergeEmployee(tuple.getT1(), requestDto))
                 .flatMap(employeeRepository::save)
+                .doOnNext(emp -> log.debug("Employee with id:{} was successfully updated", id))
                 .map(analyticsMapper::toEmployeeDto);
     }
 
+    @Transactional
     public Mono<Void> deleteEmployee(UUID id) {
         return employeeRepository.findById(id)
                 .switchIfEmpty(Mono.defer(() -> error(String.format(EMPLOYEE_NOT_FOUND_BY_ID_ERROR_MESSAGE, id),
@@ -95,10 +115,12 @@ public class EmployeeService {
                 .doOnNext(tuple -> tuple.getT1().setIsDeleted(Boolean.TRUE))
                 .map(Tuple2::getT1)
                 .flatMap(employeeRepository::save)
+                .doOnNext(employee -> log.debug("Employee with id:{} was successfully deleted", id))
                 .then();
     }
 
     private Employee mergeEmployee(Employee employee, UpsertEmployeeRequestDto requestDto) {
+        log.debug("Mering data employee:{}, updating data:{}", employee, requestDto);
         return employee.toBuilder()
                 .departmentId(requestDto.getDepartmentId())
                 .givenName(requestDto.getGivenName())
@@ -111,8 +133,19 @@ public class EmployeeService {
                 .build();
     }
 
+    private Mono<DepartmentDto> setupDepartmentSalaryBudget(DepartmentDto departmentDto) {
+        return retrieveEmployeesByDepartmentId(departmentDto.getId())
+                .collectList()
+                .map(employeeDtos -> employeeDtos.stream()
+                        .reduce(BigDecimal.ZERO, (x, employeeDto) -> x.add(employeeDto.getSalary()), BigDecimal::add))
+                .doOnNext(salaryBudget -> log.debug("Salary budget for department:{} is {}", departmentDto.getId(),
+                        salaryBudget))
+                .flatMap(salaryBudget -> departmentService.setupSalaryBudget(departmentDto.getId(), salaryBudget));
+    }
+
     private Mono<DepartmentDto> updateDepartmentSalaryBudget(Employee employee, UpsertEmployeeRequestDto requestDto) {
         if (Boolean.TRUE.equals(employee.getIsDeleted())) {
+            log.debug("Employee with id:{} was deleted, restoring data", employee.getId());
             return departmentService.increaseSalaryBudget(requestDto.getDepartmentId(), requestDto.getSalary());
         }
         return employee.getDepartmentId().equals(requestDto.getDepartmentId())

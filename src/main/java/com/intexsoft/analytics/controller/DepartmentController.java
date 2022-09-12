@@ -32,6 +32,7 @@ public class DepartmentController {
     @Operation(description = "Retrieve specific Department by Id")
     @PreAuthorize("@serviceAccess.canAccess(authentication)")
     public Mono<DepartmentDto> retrieveDepartmentById(@PathVariable UUID id) {
+        log.debug("Requested Retrieving department by id:{}", id);
         return departmentService.findDepartmentById(id);
     }
 
@@ -39,6 +40,7 @@ public class DepartmentController {
     @Operation(description = "Retrieve all departments")
     @PreAuthorize("@serviceAccess.canAccess(authentication)")
     public Flux<DepartmentDto> retrieveAllDepartments() {
+        log.debug("Requested Retrieving all departments");
         return departmentService.findAllDepartments();
     }
 
