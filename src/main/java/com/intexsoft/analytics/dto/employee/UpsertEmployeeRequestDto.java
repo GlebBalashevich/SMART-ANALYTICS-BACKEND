@@ -48,7 +48,7 @@ public class UpsertEmployeeRequestDto {
 
     @NotNull
     @Min(100)
-    @Max(100_000)
+    @Max(10000)
     private BigDecimal salary;
 
     @NotNull
