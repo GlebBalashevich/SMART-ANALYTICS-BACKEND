@@ -11,9 +11,9 @@ REST Service to make operations with Employees in Departments and collect analyt
 - Docker
 
 ### Application launch:
-Fastest way: **.\gradlew :composeUP**  
+Use docker compose commands to run application
 To disable security use profile - 'noauth'  
-To run aplication locally (out of docker) user - 'local'
+To run aplication locally (out of docker) use profile - 'local'
 
 ### Application Usage:
 - Postman collection: https://www.getpostman.com/collections/924cb7d3b903dcdd33c2
@@ -28,7 +28,7 @@ On startup, the application will initialize the database and fill it with predef
   For Departments only read operations available (create/update/delete - out of scope)
 2. Employee.
   Several records will be inserted to the 'employee' table for more convenient testing.  
-  For Employees all CRUD operations available. The manager cannot manage employees from other departments.
+  For Employees all CRUD operations available. The manager **cannot manage employees and receive analytics** from other departments.
 3. Authentication
   Two records will be added to the 'authentication' table, one for each department:
   - 'java_solutions@mail.com' email - for "Java Enterprise Solutions"
