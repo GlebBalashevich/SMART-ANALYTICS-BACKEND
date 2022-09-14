@@ -3,7 +3,8 @@ package com.intexsoft.analytics.repository;
 import java.util.UUID;
 
 import com.intexsoft.analytics.model.Employee;
-import com.intexsoft.analytics.model.Title;
+import com.intexsoft.analytics.model.TitleSalaryFork;
+import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,8 +17,8 @@ public interface EmployeeRepository extends ReactiveCrudRepository<Employee, UUI
 
     Mono<Employee> findEmployeeByEmailAndIsDeletedFalse(String email);
 
-    Mono<Employee> findFirstByDepartmentIdAndTitleOrderBySalaryAsc(UUID departmentId, Title title);
-
-    Mono<Employee> findFirstByDepartmentIdAndTitleOrderBySalaryDesc(UUID departmentId, Title title);
+    @Query("SELECT employee.title, max(employee.salary) AS max_salary, min(employee.salary) AS min_salary " +
+            "FROM employee WHERE employee.department_id = :departmentId GROUP BY title")
+    Flux<TitleSalaryFork> findTitlesSalaryForksByDepartmentId(UUID departmentId);
 
 }

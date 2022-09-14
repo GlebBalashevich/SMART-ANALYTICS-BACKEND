@@ -1,7 +1,8 @@
 package com.intexsoft.analytics.dto.analytics;
 
-import java.math.BigDecimal;
+import java.util.List;
 
+import com.intexsoft.analytics.dto.employee.TitleSalaryForkDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,8 +14,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SalaryAnalyticsDto {
 
-    private String departmentName;
-
-    private BigDecimal salaryValue;
+    private List<TitleSalaryForkDto> titleSalaryForks;
 
 }

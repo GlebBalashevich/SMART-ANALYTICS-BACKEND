@@ -1,13 +1,11 @@
 package com.intexsoft.analytics.service;
 
-import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 import com.intexsoft.analytics.TestDataProvider;
-import com.intexsoft.analytics.dto.employee.EmployeeDto;
+import com.intexsoft.analytics.dto.analytics.SalaryAnalyticsDto;
 import com.intexsoft.analytics.exception.DepartmentException;
-import com.intexsoft.analytics.model.SelectionCriteria;
-import com.intexsoft.analytics.model.Title;
 import com.intexsoft.analytics.util.ErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,52 +38,12 @@ class AnalyticsServiceTests {
     @Test
     void testFindDepartmentBorderSalary() {
         var departmentId = UUID.randomUUID();
-        var title = Title.LEAD;
-        var selectionCriteria = SelectionCriteria.MAX;
-        var departmentDto = TestDataProvider.getDepartmentDtoStub(departmentId);
-        var employeeDto = TestDataProvider.getEmployeeDtoStub(UUID.randomUUID(), departmentId);
-        var expected = TestDataProvider.getSalaryAnalyticsDtoStub();
+        var titleSalaryForkDto = TestDataProvider.getTitleSalaryForkDtoStub();
+        var expected = SalaryAnalyticsDto.builder().titleSalaryForks(List.of(titleSalaryForkDto)).build();
 
-        when(departmentService.retrieveDepartmentById(departmentId)).thenReturn(Mono.just(departmentDto));
-        when(employeeService.findEmployeeWithBorderSalary(departmentId, title, selectionCriteria))
-                .thenReturn(Mono.just(employeeDto));
+        when(employeeService.findTitlesSalaryForks(departmentId)).thenReturn(Flux.just(titleSalaryForkDto));
 
-        StepVerifier.create(analyticsService.findDepartmentBorderSalary(departmentId, title, selectionCriteria))
-                .expectNext(expected)
-                .verifyComplete();
-    }
-
-    @Test
-    void testFindDepartmentBorderSalaryDepartmentNotFoundException() {
-        var departmentId = UUID.randomUUID();
-        var title = Title.LEAD;
-        var selectionCriteria = SelectionCriteria.MAX;
-        var employeeDto = TestDataProvider.getEmployeeDtoStub(UUID.randomUUID(), departmentId);
-
-        when(departmentService.retrieveDepartmentById(departmentId)).thenReturn(
-                Mono.error(() -> new DepartmentException("Department not found", HttpStatus.NOT_FOUND,
-                        ErrorCode.DEPARTMENT_NOT_FOUND)));
-        when(employeeService.findEmployeeWithBorderSalary(departmentId, title, selectionCriteria))
-                .thenReturn(Mono.just(employeeDto));
-
-        StepVerifier.create(analyticsService.findDepartmentBorderSalary(departmentId, title, selectionCriteria))
-                .verifyError(DepartmentException.class);
-    }
-
-    @Test
-    void testFindDepartmentBorderSalaryEmployeeNotFound() {
-        var departmentId = UUID.randomUUID();
-        var title = Title.LEAD;
-        var selectionCriteria = SelectionCriteria.MAX;
-        var departmentDto = TestDataProvider.getDepartmentDtoStub(departmentId);
-        var expected = TestDataProvider.getSalaryAnalyticsDtoStub();
-        expected.setSalaryValue(BigDecimal.ZERO);
-
-        when(departmentService.retrieveDepartmentById(departmentId)).thenReturn(Mono.just(departmentDto));
-        when(employeeService.findEmployeeWithBorderSalary(departmentId, title, selectionCriteria))
-                .thenReturn(Mono.just(EmployeeDto.builder().build()));
-
-        StepVerifier.create(analyticsService.findDepartmentBorderSalary(departmentId, title, selectionCriteria))
+        StepVerifier.create(analyticsService.findDepartmentSalaryForks(departmentId))
                 .expectNext(expected)
                 .verifyComplete();
     }

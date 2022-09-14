@@ -9,6 +9,7 @@ import com.intexsoft.analytics.model.Authentication;
 import com.intexsoft.analytics.model.Department;
 import com.intexsoft.analytics.model.Employee;
 import com.intexsoft.analytics.model.Title;
+import com.intexsoft.analytics.model.TitleSalaryFork;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -111,6 +112,22 @@ class AnalyticsMapperTests {
         Assertions.assertThat(actual.getHireDate()).isEqualTo(employee.getHireDate());
         Assertions.assertThat(actual.getSalary()).isEqualTo(employee.getSalary());
         Assertions.assertThat(actual.getTitle()).isEqualTo(employee.getTitle());
+    }
+
+    @Test
+    void testToTitleSalaryForkDto(){
+        var titleSalaryFork = TitleSalaryFork.builder()
+                .title(Title.LEAD)
+                .minSalary(BigDecimal.valueOf(4500))
+                .maxSalary(BigDecimal.valueOf(5500))
+                .build();
+
+        var actual = analyticsMapper.toTitleSalaryForkDto(titleSalaryFork);
+
+        Assertions.assertThat(actual).isNotNull();
+        Assertions.assertThat(actual.getTitle()).isEqualTo(titleSalaryFork.getTitle());
+        Assertions.assertThat(actual.getMinSalary()).isEqualTo(titleSalaryFork.getMinSalary());
+        Assertions.assertThat(actual.getMaxSalary()).isEqualTo(titleSalaryFork.getMaxSalary());
     }
 
 }

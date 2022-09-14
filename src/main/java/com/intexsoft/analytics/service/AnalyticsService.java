@@ -1,6 +1,6 @@
 package com.intexsoft.analytics.service;
 
-import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -8,8 +8,6 @@ import com.intexsoft.analytics.dto.analytics.SalaryAnalyticsDto;
 import com.intexsoft.analytics.dto.analytics.SeniorityAnalyticsDto;
 import com.intexsoft.analytics.dto.department.DepartmentDto;
 import com.intexsoft.analytics.dto.employee.EmployeeDto;
-import com.intexsoft.analytics.model.SelectionCriteria;
-import com.intexsoft.analytics.model.Title;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,11 +22,11 @@ public class AnalyticsService {
 
     private final EmployeeService employeeService;
 
-    public Mono<SalaryAnalyticsDto> findDepartmentBorderSalary(UUID departmentId, Title title,
-            SelectionCriteria selectionCriteria) {
-        return departmentService.retrieveDepartmentById(departmentId)
-                .zipWith(employeeService.findEmployeeWithBorderSalary(departmentId, title, selectionCriteria))
-                .map(tuple -> buildSalaryAnalyticsDto(tuple.getT1(), tuple.getT2()));
+    public Mono<SalaryAnalyticsDto> findDepartmentSalaryForks(UUID departmentId) {
+        return employeeService.findTitlesSalaryForks(departmentId)
+                .sort(Comparator.comparing(titleSalaryForkDto -> titleSalaryForkDto.getTitle().getSeniorityIndex()))
+                .collectList()
+                .map(titleSalaryForkDtos -> SalaryAnalyticsDto.builder().titleSalaryForks(titleSalaryForkDtos).build());
     }
 
     public Mono<SeniorityAnalyticsDto> defineDepartmentSeniority(UUID departmentId) {
@@ -36,14 +34,6 @@ public class AnalyticsService {
                 .zipWith(employeeService.retrieveEmployeesByDepartmentId(departmentId).collectList()
                         .map(this::calculateSeniority))
                 .map(tuple -> buildSeniorityAnalyticsDto(tuple.getT1(), tuple.getT2()));
-    }
-
-    private SalaryAnalyticsDto buildSalaryAnalyticsDto(DepartmentDto departmentDto, EmployeeDto employeeDto) {
-        final var salaryValue = employeeDto.getSalary() == null ? BigDecimal.ZERO : employeeDto.getSalary();
-        return SalaryAnalyticsDto.builder()
-                .departmentName(departmentDto.getName())
-                .salaryValue(salaryValue)
-                .build();
     }
 
     private Double calculateSeniority(List<EmployeeDto> employeeDtos) {

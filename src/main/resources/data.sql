@@ -30,7 +30,7 @@ VALUES ('22a1db07-80a6-4578-b2d8-1d4b7326cae0', 'example1@mail.com', 'Ivan', 'Iv
        ('22a1db07-80a6-4578-b2d8-1d4b7326cae0', 'example9@mail.com', 'Ivan', 'Petrov', '1989-02-02', '2021-04-10',
         '2600', 'MIDDLE', 'false', current_timestamp, current_timestamp),
        ('22a1db07-80a6-4578-b2d8-1d4b7326cae0', 'example10@mail.com', 'Petr', 'Glebov', '1990-04-012', '2022-02-15',
-        '9800', 'JUNIOR', 'false', current_timestamp, current_timestamp),
+        '700', 'JUNIOR', 'false', current_timestamp, current_timestamp),
        ('22a1db07-80a6-4578-b2d8-1d4b7326cae0', 'example11@mail.com', 'Sergei', 'Sidorov', '1987-11-20', '2020-11-15',
         '4800', 'LEAD', 'false', current_timestamp, current_timestamp),
        ('83110a26-fa26-4cc2-8963-d86520a918f9', 'example12@mail.com', 'Sidr', 'Sidorov', '1988-05-28', '2018-08-01',

@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import com.intexsoft.analytics.dto.analytics.SalaryAnalyticsDto;
+import com.intexsoft.analytics.dto.employee.TitleSalaryForkDto;
 import com.intexsoft.analytics.dto.analytics.SeniorityAnalyticsDto;
 import com.intexsoft.analytics.dto.department.DepartmentDto;
 import com.intexsoft.analytics.dto.employee.EmployeeDto;
@@ -13,6 +13,7 @@ import com.intexsoft.analytics.dto.employee.UpsertEmployeeRequestDto;
 import com.intexsoft.analytics.model.Department;
 import com.intexsoft.analytics.model.Employee;
 import com.intexsoft.analytics.model.Title;
+import com.intexsoft.analytics.model.TitleSalaryFork;
 
 public class TestDataProvider {
 
@@ -78,10 +79,19 @@ public class TestDataProvider {
                 .build();
     }
 
-    public static SalaryAnalyticsDto getSalaryAnalyticsDtoStub() {
-        return SalaryAnalyticsDto.builder()
-                .departmentName("Test Department")
-                .salaryValue(BigDecimal.valueOf(5000))
+    public static TitleSalaryFork getTitleSalaryForkStub() {
+        return TitleSalaryFork.builder()
+                .title(Title.JUNIOR)
+                .minSalary(BigDecimal.valueOf(800))
+                .maxSalary(BigDecimal.valueOf(1200))
+                .build();
+    }
+
+    public static TitleSalaryForkDto getTitleSalaryForkDtoStub() {
+        return TitleSalaryForkDto.builder()
+                .title(Title.JUNIOR)
+                .minSalary(BigDecimal.valueOf(800))
+                .maxSalary(BigDecimal.valueOf(1200))
                 .build();
     }
 

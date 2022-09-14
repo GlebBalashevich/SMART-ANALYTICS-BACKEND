@@ -2,14 +2,13 @@ package com.intexsoft.analytics.service;
 
 import java.util.UUID;
 
+import com.intexsoft.analytics.dto.employee.TitleSalaryForkDto;
 import com.intexsoft.analytics.dto.department.DepartmentDto;
 import com.intexsoft.analytics.dto.employee.EmployeeDto;
 import com.intexsoft.analytics.dto.employee.UpsertEmployeeRequestDto;
 import com.intexsoft.analytics.exception.EmployeeException;
 import com.intexsoft.analytics.mapper.AnalyticsMapper;
 import com.intexsoft.analytics.model.Employee;
-import com.intexsoft.analytics.model.SelectionCriteria;
-import com.intexsoft.analytics.model.Title;
 import com.intexsoft.analytics.repository.EmployeeRepository;
 import com.intexsoft.analytics.util.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -65,16 +64,9 @@ public class EmployeeService {
                 .map(analyticsMapper::toEmployeeDto);
     }
 
-    public Mono<EmployeeDto> findEmployeeWithBorderSalary(UUID departmentId, Title title,
-            SelectionCriteria selectionCriteria) {
-        final var employee = SelectionCriteria.MAX == selectionCriteria
-                ? employeeRepository.findFirstByDepartmentIdAndTitleOrderBySalaryDesc(departmentId, title)
-                : employeeRepository.findFirstByDepartmentIdAndTitleOrderBySalaryAsc(departmentId, title);
-        return employee
-                .doOnNext(emp -> log.debug("Employee with title:{} for criteria:{} for department was found:{}", title,
-                        selectionCriteria, departmentId))
-                .defaultIfEmpty(Employee.builder().build())
-                .map(analyticsMapper::toEmployeeDto);
+    public Flux<TitleSalaryForkDto> findTitlesSalaryForks(UUID departmentId) {
+        return employeeRepository.findTitlesSalaryForksByDepartmentId(departmentId)
+                .map(analyticsMapper::toTitleSalaryForkDto);
     }
 
     @Transactional

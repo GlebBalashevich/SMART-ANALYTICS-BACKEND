@@ -146,54 +146,28 @@ class EmployeeServiceTests {
     }
 
     @Test
-    void testFindEmployeeWithMAXBorderSalary() {
-        var title = Title.LEAD;
-        var selectionCriteria = SelectionCriteria.MAX;
-        var id = UUID.randomUUID();
+    void testFindTitleSalaryForks() {
         var departmentId = UUID.randomUUID();
-        var employee = TestDataProvider.getEmployeeStub(id, departmentId);
-        var expected = TestDataProvider.getEmployeeDtoStub(id, departmentId);
+        var titleSalaryFork = TestDataProvider.getTitleSalaryForkStub();
+        var expected = TestDataProvider.getTitleSalaryForkDtoStub();
 
-        when(employeeRepository.findFirstByDepartmentIdAndTitleOrderBySalaryDesc(departmentId, title))
-                .thenReturn(Mono.just(employee));
-        when(analyticsMapper.toEmployeeDto(employee)).thenReturn(expected);
+        when(employeeRepository.findTitlesSalaryForksByDepartmentId(departmentId))
+                .thenReturn(Flux.just(titleSalaryFork));
+        when(analyticsMapper.toTitleSalaryForkDto(titleSalaryFork)).thenReturn(expected);
 
-        StepVerifier.create(employeeService.findEmployeeWithBorderSalary(departmentId, title, selectionCriteria))
+        StepVerifier.create(employeeService.findTitlesSalaryForks(departmentId))
                 .expectNext(expected)
                 .verifyComplete();
     }
 
     @Test
-    void testFindEmployeeWithMINBorderSalary() {
-        var title = Title.LEAD;
-        var selectionCriteria = SelectionCriteria.MIN;
-        var id = UUID.randomUUID();
+    void testFindTitleSalaryForksNoResults() {
         var departmentId = UUID.randomUUID();
-        var employee = TestDataProvider.getEmployeeStub(id, departmentId);
-        var expected = TestDataProvider.getEmployeeDtoStub(id, departmentId);
 
-        when(employeeRepository.findFirstByDepartmentIdAndTitleOrderBySalaryAsc(departmentId, title))
-                .thenReturn(Mono.just(employee));
-        when(analyticsMapper.toEmployeeDto(employee)).thenReturn(expected);
+        when(employeeRepository.findTitlesSalaryForksByDepartmentId(departmentId))
+                .thenReturn(Flux.empty());
 
-        StepVerifier.create(employeeService.findEmployeeWithBorderSalary(departmentId, title, selectionCriteria))
-                .expectNext(expected)
-                .verifyComplete();
-    }
-
-    @Test
-    void testFindEmployeeWithBorderSalaryNoEmployee() {
-        var title = Title.LEAD;
-        var selectionCriteria = SelectionCriteria.MIN;
-        var departmentId = UUID.randomUUID();
-        var expected = EmployeeDto.builder().build();
-
-        when(employeeRepository.findFirstByDepartmentIdAndTitleOrderBySalaryAsc(departmentId, title))
-                .thenReturn(Mono.empty());
-        when(analyticsMapper.toEmployeeDto(Employee.builder().build())).thenReturn(expected);
-
-        StepVerifier.create(employeeService.findEmployeeWithBorderSalary(departmentId, title, selectionCriteria))
-                .expectNext(expected)
+        StepVerifier.create(employeeService.findTitlesSalaryForks(departmentId))
                 .verifyComplete();
     }
 
